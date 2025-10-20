@@ -19,8 +19,19 @@ if errorlevel 1 (
 echo ✅ Python found!
 echo.
 
+echo 🔍 Checking pip installation...
+pip --version >nul 2>&1
+if errorlevel 1 (
+    echo ❌ pip is not installed!
+    echo Please download and install pip from: https://pip.pypa.io/en/stable/installation/
+    pause
+    exit /b 1
+)
+echo ✅ pip found!
+echo.
+
 echo 📦 Installing required packages...
-pip install Flask pyodbc --quiet
+pip install Flask pyodbc pandas openpyxl --quiet
 if errorlevel 1 (
     echo ⚠️  Warning: Package installation had issues, but continuing...
 )
