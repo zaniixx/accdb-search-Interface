@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام البحث في قواعد بيانات الناخبين العراقيين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+
+        .header-icon {
+            font-size: 3rem;
+            color: #3b82f6;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-weight: 500;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .nav-tab.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title i {
+            color: #3b82f6;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: #6b7280;
+            font-size: 0.75rem;
+        }
+
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-control:hover {
+            border-color: #9ca3af;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        select.form-control {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.75rem center;
+            background-repeat: no-repeat;
+            background-size: 1rem;
+            padding-right: 2.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-lg {
+            padding: 1rem 3rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            color: #1e40af;
+        }
+
+        .alert-info i {
+            color: #3b82f6;
+            font-size: 1.25rem;
+        }
+
+        .download-section {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 12px;
+            border: 1px solid #bae6fd;
+            margin: 2rem 0;
+        }
+
+        .download-section h3 {
+            color: #0c4a6e;
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .download-section p {
+            color: #0369a1;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-input-label:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .file-input-label i {
+            font-size: 2rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-input-label span {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .file-input-label small {
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .loading-subtext {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 3rem;
+        }
+
+        .footer p {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .footer a:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* RTL Specific Adjustments */
+        .nav-tabs {
+            direction: rtl;
+        }
+
+        .form-control {
+            text-align: right;
+        }
+
+        select.form-control {
+            background-position: left 0.75rem center;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-card">
+            <div class="spinner"></div>
+            <div class="loading-text">جاري البحث في قواعد البيانات...</div>
+            <div class="loading-subtext">يرجى الانتظار، قد تستغرق العملية بضع ثوانٍ</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <span class="header-icon"><i class="fas fa-search"></i></span>
+            <h1>نظام البحث في قواعد بيانات الناخبين العراقيين</h1>
+            <p>بحث سريع ودقيق في سجلات 19 محافظة عراقية</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button type="button" class="nav-tab active" onclick="showTab('single')">
+                <i class="fas fa-user"></i>
+                البحث الفردي
+            </button>
+            <button type="button" class="nav-tab" onclick="showTab('multi')">
+                <i class="fas fa-users"></i>
+                البحث المتعدد
+            </button>
+            <button type="button" class="nav-tab" onclick="showTab('excel')">
+                <i class="fas fa-file-excel"></i>
+                رفع ملف Excel
+            </button>
+        </nav>
+
+        <!-- Single Search Tab -->
+        <div id="single-tab" class="tab-content active">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>إرشادات البحث:</strong>
+                    يمكنك تحديد محافظة معينة للبحث السريع، أو ترك الحقل فارغاً للبحث في جميع المحافظات.
+                    يجب إدخال معيار بحث واحد على الأقل (الاسم، الرقم، إلخ).
+                </div>
+            </div>
+
+            <form method="post" action="/search" id="singleForm" enctype="multipart/form-data">
+                <input type="hidden" name="search_type" value="single">
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-cog"></i>
+                            إعدادات البحث
+                        </h2>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                المحافظة (اختياري)
+                            </label>
+                            <select name="table" class="form-control">
+                                <option value="">🌍 جميع المحافظات (19 محافظة)</option>
+                                <optgroup label="━━━ البصرة - الناصرية - الموصل ━━━">
+                                    <option value="dbo_Basra">البصرة</option>
+                                    <option value="dbo_Diqar">ذي قار (الناصرية)</option>
+                                    <option value="dbo_Ninawa">نينوى (الموصل)</option>
+                                </optgroup>
+                                <optgroup label="━━━ بابل - ديالى - القادسية - صلاح الدين - الأنبار ━━━">
+                                    <option value="dbo_Anbar">الأنبار</option>
+                                    <option value="dbo_Babil">بابل</option>
+                                    <option value="dbo_diyala">ديالى</option>
+                                    <option value="dbo_Qadisyah">القادسية (الديوانية)</option>
+                                    <option value="dbo_SlahAldin">صلاح الدين</option>
+                                </optgroup>
+                                <optgroup label="━━━ بغداد ━━━">
+                                    <option value="dbo_Karikh">بغداد الكرخ</option>
+                                    <option value="dbo_Rusafa">بغداد الرصافة</option>
+                                </optgroup>
+                                <optgroup label="━━━ إقليم كردستان ━━━">
+                                    <option value="dbo_Dahuk">دهوك</option>
+                                    <option value="dbo_Erbil">أربيل</option>
+                                    <option value="dbo_Kirkuk">كركوك</option>
+                                    <option value="dbo_sulimaniah">السليمانية</option>
+                                </optgroup>
+                                <optgroup label="━━━ كربلاء - ميسان - المثنى - النجف - واسط ━━━">
+                                    <option value="dbo_Kirbla">كربلاء</option>
+                                    <option value="dbo_Misan">ميسان</option>
+                                    <option value="dbo_Muthana">المثنى</option>
+                                    <option value="dbo_Najaf">النجف</option>
+                                    <option value="dbo_Wasit">واسط</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-bullseye"></i>
+                                نوع البحث
+                            </label>
+                            <select name="search_mode" class="form-control">
+                                <option value="exact" selected>🎯 بحث دقيق (مطابقة كاملة - أسرع)</option>
+                                <option value="partial">🔍 بحث جزئي (يحتوي على - أشمل)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-search"></i>
+                            معايير البحث
+                        </h2>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-id-card"></i>
+                                الرقم الشخصي
+                            </label>
+                            <input type="number" name="perid" class="form-control" placeholder="أدخل الرقم الشخصي">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-users"></i>
+                                رقم العائلة
+                            </label>
+                            <input type="number" name="perfamno" class="form-control" placeholder="أدخل رقم العائلة">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-hashtag"></i>
+                                الرقم الفرعي
+                            </label>
+                            <input type="number" name="persubno" class="form-control" placeholder="أدخل الرقم الفرعي">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>
+                                الاسم الأول
+                            </label>
+                            <input type="text" name="perfirst" class="form-control" placeholder="أدخل الاسم الأول">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-male"></i>
+                                اسم الأب
+                            </label>
+                            <input type="text" name="perfather" class="form-control" placeholder="أدخل اسم الأب">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user-tie"></i>
+                                اسم الجد
+                            </label>
+                            <input type="text" name="pergrand" class="form-control" placeholder="أدخل اسم الجد">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-signature"></i>
+                                الاسم الرابع
+                            </label>
+                            <input type="text" name="perfourth_name" class="form-control" placeholder="أدخل الاسم الرابع">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-female"></i>
+                                اسم الأم
+                            </label>
+                            <input type="text" name="mothername" class="form-control" placeholder="أدخل اسم الأم">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-venus-mars"></i>
+                                الجنس
+                            </label>
+                            <select name="pergender" class="form-control">
+                                <option value="">جميع الأجناس</option>
+                                <option value="0">👨 ذكر</option>
+                                <option value="1">👩 أنثى</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-birthday-cake"></i>
+                                تاريخ الميلاد
+                            </label>
+                            <input type="text" name="perdob" class="form-control" placeholder="مثال: 1990/01/15">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-globe"></i>
+                                بلد الولادة
+                            </label>
+                            <input type="text" name="perbthcountry" class="form-control" placeholder="أدخل بلد الولادة">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-phone"></i>
+                                رقم الهاتف
+                            </label>
+                            <input type="tel" name="pertelno" class="form-control" placeholder="مثال: 07701234567">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-building"></i>
+                                مركز الاقتراع
+                            </label>
+                            <input type="text" name="vrcname" class="form-control" placeholder="أدخل مركز الاقتراع">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-vote-yea"></i>
+                                محطة الاقتراع
+                            </label>
+                            <input type="text" name="pcname" class="form-control" placeholder="أدخل محطة الاقتراع">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-home"></i>
+                                العنوان
+                            </label>
+                            <input type="text" name="peraddress" class="form-control" placeholder="أدخل العنوان">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-flag"></i>
+                                الجنسية
+                            </label>
+                            <input type="text" name="pernationality" class="form-control" placeholder="أدخل الجنسية">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-search"></i>
+                        بحث في قاعدة البيانات
+                    </button>
+                </div>
+            </form>
+        </div>
+            
+        <!-- Multi Search Tab -->
+        <div id="multi-tab" class="tab-content">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>إرشادات البحث المتعدد:</strong>
+                    أدخل قيم متعددة مفصولة بفواصل أو سطور جديدة. مثال: 12345, 67890, 11111
+                </div>
+            </div>
+
+            <form method="post" action="/search" id="multiForm">
+                <input type="hidden" name="search_type" value="multi">
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-cog"></i>
+                            إعدادات البحث المتعدد
+                        </h2>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                المحافظة (اختياري)
+                            </label>
+                            <select name="table" class="form-control">
+                                <option value="">🌍 جميع المحافظات (19 محافظة)</option>
+                                <optgroup label="━━━ البصرة - الناصرية - الموصل ━━━">
+                                    <option value="dbo_Basra">البصرة</option>
+                                    <option value="dbo_Diqar">ذي قار (الناصرية)</option>
+                                    <option value="dbo_Ninawa">نينوى (الموصل)</option>
+                                </optgroup>
+                                <optgroup label="━━━ بابل - ديالى - القادسية - صلاح الدين - الأنبار ━━━">
+                                    <option value="dbo_Anbar">الأنبار</option>
+                                    <option value="dbo_Babil">بابل</option>
+                                    <option value="dbo_diyala">ديالى</option>
+                                    <option value="dbo_Qadisyah">القادسية</option>
+                                    <option value="dbo_SlahAldin">صلاح الدين</option>
+                                </optgroup>
+                                <optgroup label="━━━ بغداد ━━━">
+                                    <option value="dbo_Karikh">بغداد الكرخ</option>
+                                    <option value="dbo_Rusafa">بغداد الرصافة</option>
+                                </optgroup>
+                                <optgroup label="━━━ دهوك - أربيل - كركوك - السليمانية ━━━">
+                                    <option value="dbo_Dahuk">دهوك</option>
+                                    <option value="dbo_Erbil">أربيل</option>
+                                    <option value="dbo_Kirkuk">كركوك</option>
+                                    <option value="dbo_sulimaniah">السليمانية</option>
+                                </optgroup>
+                                <optgroup label="━━━ كربلاء - ميسان - المثنى - النجف - واسط ━━━">
+                                    <option value="dbo_Kirbla">كربلاء</option>
+                                    <option value="dbo_Misan">ميسان</option>
+                                    <option value="dbo_Muthana">المثنى</option>
+                                    <option value="dbo_Najaf">النجف</option>
+                                    <option value="dbo_Wasit">واسط</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-bullseye"></i>
+                                نوع البحث
+                            </label>
+                            <select name="search_mode" class="form-control">
+                                <option value="exact">دقيق (أسرع)</option>
+                                <option value="partial">جزئي (أبطأ)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem;">
+                        <h3 style="color: #1e293b; margin-bottom: 1rem; font-size: 1.125rem; font-weight: 600;">
+                            <i class="fas fa-list"></i>
+                            معايير البحث (أدخل قيم متعددة مفصولة بفواصل)
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-id-card"></i>
+                                    الرقم الشخصي
+                                </label>
+                                <textarea name="perid_multi" class="form-control" rows="3" placeholder="أدخل أرقام شخصية متعددة&#10;مثال: 12345, 67890, 11111"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-users"></i>
+                                    رقم العائلة
+                                </label>
+                                <textarea name="perfamno_multi" class="form-control" rows="3" placeholder="أدخل أرقام عائلات متعددة&#10;مثال: 194114, 195001, 196005"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-hashtag"></i>
+                                    الرقم الفرعي
+                                </label>
+                                <textarea name="persubno_multi" class="form-control" rows="3" placeholder="أدخل أرقام فرعية متعددة&#10;مثال: 1, 2, 3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-user"></i>
+                                    الاسم الأول
+                                </label>
+                                <textarea name="perfirst_multi" class="form-control" rows="3" placeholder="أدخل أسماء أولى متعددة&#10;مثال: أحمد, محمد, علي"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-male"></i>
+                                    اسم الأب
+                                </label>
+                                <textarea name="perfather_multi" class="form-control" rows="3" placeholder="أدخل أسماء آباء متعددة&#10;مثال: حسن, علي, أحمد"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-user-tie"></i>
+                                    اسم الجد
+                                </label>
+                                <textarea name="pergrand_multi" class="form-control" rows="3" placeholder="أدخل أسماء أجداد متعددة&#10;مثال: محمد, إبراهيم, يوسف"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-search"></i>
+                            بحث متعدد في قاعدة البيانات
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Excel Upload Tab -->
+        <div id="excel-tab" class="tab-content">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>إرشادات رفع ملف Excel:</strong>
+                    أنشئ ملف Excel بأعمدة تحتوي على معايير البحث (perid, perfamno, perfirst, إلخ).
+                    سيتم البحث عن كل صف على حدة.
+                    <br><strong>💡 نصيحة:</strong> حمل القالب الجاهز من الزر أدناه واملأ البيانات فيه مباشرة.
+                </div>
+            </div>
+
+            <form method="post" action="/search" id="excelForm" enctype="multipart/form-data">
+                <input type="hidden" name="search_type" value="excel">
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-cog"></i>
+                            إعدادات البحث عبر Excel
+                        </h2>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                المحافظة (اختياري)
+                            </label>
+                            <select name="table" class="form-control">
+                                <option value="">🌍 جميع المحافظات (19 محافظة)</option>
+                                <optgroup label="━━━ البصرة - الناصرية - الموصل ━━━">
+                                    <option value="dbo_Basra">البصرة</option>
+                                    <option value="dbo_Diqar">ذي قار (الناصرية)</option>
+                                    <option value="dbo_Ninawa">نينوى (الموصل)</option>
+                                </optgroup>
+                                <optgroup label="━━━ بابل - ديالى - القادسية - صلاح الدين - الأنبار ━━━">
+                                    <option value="dbo_Anbar">الأنبار</option>
+                                    <option value="dbo_Babil">بابل</option>
+                                    <option value="dbo_diyala">ديالى</option>
+                                    <option value="dbo_Qadisyah">القادسية</option>
+                                    <option value="dbo_SlahAldin">صلاح الدين</option>
+                                </optgroup>
+                                <optgroup label="━━━ بغداد ━━━">
+                                    <option value="dbo_Karikh">بغداد الكرخ</option>
+                                    <option value="dbo_Rusafa">بغداد الرصافة</option>
+                                </optgroup>
+                                <optgroup label="━━━ دهوك - أربيل - كركوك - السليمانية ━━━">
+                                    <option value="dbo_Dahuk">دهوك</option>
+                                    <option value="dbo_Erbil">أربيل</option>
+                                    <option value="dbo_Kirkuk">كركوك</option>
+                                    <option value="dbo_sulimaniah">السليمانية</option>
+                                </optgroup>
+                                <optgroup label="━━━ كربلاء - ميسان - المثنى - النجف - واسط ━━━">
+                                    <option value="dbo_Kirbla">كربلاء</option>
+                                    <option value="dbo_Misan">ميسان</option>
+                                    <option value="dbo_Muthana">المثنى</option>
+                                    <option value="dbo_Najaf">النجف</option>
+                                    <option value="dbo_Wasit">واسط</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-bullseye"></i>
+                                نوع البحث
+                            </label>
+                            <select name="search_mode" class="form-control">
+                                <option value="exact">دقيق (أسرع)</option>
+                                <option value="partial">جزئي (أبطأ)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="download-section">
+                    <h3>تحميل القالب الجاهز</h3>
+                    <p>قالب Excel مُعد مسبقاً مع جميع الأعمدة والتعليمات</p>
+                    <a href="/download_template" class="btn btn-primary">
+                        <i class="fas fa-download"></i>
+                        تحميل قالب Excel
+                    </a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-file-excel"></i>
+                            رفع ملف Excel
+                        </h2>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-upload"></i>
+                            اختر ملف Excel
+                        </label>
+                        <div class="file-input-wrapper">
+                            <input type="file" name="excel_file" accept=".xlsx,.xls" required id="excelFile" class="file-input">
+                            <label for="excelFile" class="file-input-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>انقر لاختيار ملف Excel</span>
+                                <small>الملف يجب أن يحتوي على أعمدة مثل: perid, perfamno, perfirst, إلخ.</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-search"></i>
+                            بحث عبر ملف Excel
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <footer class="footer">
+            <p>
+                <i class="fas fa-lightbulb"></i>
+                <strong>نصيحة:</strong> استخدم البحث الدقيق للحصول على نتائج أسرع بـ 10 مرات!
+            </p>
+            <p>Made with ❤️ by <a href="https://github.com/zaniixx" target="_blank">Zanix</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.nav-tab');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // File input display
+        document.getElementById('excelFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const label = e.target.nextElementSibling;
+            if (file) {
+                label.innerHTML = `
+                    <i class="fas fa-file-excel"></i>
+                    <span>${file.name}</span>
+                    <small>الملف جاهز للرفع</small>
+                `;
+                label.style.borderColor = '#10b981';
+                label.style.background = '#f0fdf4';
+            }
+        });
+
+        // Single search form validation
+        const singleForm = document.getElementById('singleForm');
+        singleForm.addEventListener('submit', function(e) {
+            // Check if at least one search field is filled
+            const fields = ['perid', 'perfamno', 'persubno', 'perfirst', 'perfather', 'pergrand', 'perfourth_name',
+                          'mothername', 'pergender', 'perdob', 'perbthcountry', 'pertelno', 'vrcname', 'pcname',
+                          'peraddress', 'pernationality'];
+
+            let hasValue = false;
+            for (let field of fields) {
+                const input = singleForm.elements[field];
+                if (input && input.value && input.value.trim() !== '') {
+                    hasValue = true;
+                    break;
+                }
+            }
+
+            if (!hasValue) {
+                e.preventDefault();
+                alert('يرجى إدخال معيار بحث واحد على الأقل!');
+                return false;
+            }
+
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.add('show');
+        });
+
+        // Multi search form validation
+        const multiForm = document.getElementById('multiForm');
+        multiForm.addEventListener('submit', function(e) {
+            // Check if at least one multi field has values
+            const multiFields = ['perid_multi', 'perfamno_multi', 'persubno_multi', 'perfirst_multi',
+                               'perfather_multi', 'pergrand_multi'];
+
+            let hasValue = false;
+            for (let field of multiFields) {
+                const textarea = multiForm.elements[field];
+                if (textarea && textarea.value && textarea.value.trim() !== '') {
+                    hasValue = true;
+                    break;
+                }
+            }
+
+            if (!hasValue) {
+                e.preventDefault();
+                alert('يرجى إدخال قيم بحث متعددة في حقل واحد على الأقل!');
+                return false;
+            }
+
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.add('show');
+        });
+
+        // Excel form validation
+        const excelForm = document.getElementById('excelForm');
+        excelForm.addEventListener('submit', function(e) {
+            const fileInput = excelForm.elements['excel_file'];
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                e.preventDefault();
+                alert('يرجى اختيار ملف Excel!');
+                return false;
+            }
+
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.add('show');
+        });
+    </script>
+</body>
+</html>
