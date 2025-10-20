@@ -26,37 +26,151 @@ cache_max_size = 50  # Keep last 50 searches
 # Table schema cache to avoid repeated column queries
 table_schema_cache = {}
 
-# List of database files
-db_files = [
-    'البصرة- الناصرية - الموصل.accdb',
-    'بابل- ديالى- الديوانية-صلاح الدين-الانبار.accdb',
-    'بغداد كرخ - رصافة.accdb',
-    'دهوك- اربيل-السليمانية-كركوك.accdb',
-    'كربلاء-ميسان- المثنى- النجف- واسط.accdb'
-]
+# Database directory
+DATABASE_DIR = 'databases'
 
-# Mapping of tables to databases and their display names
-table_to_db = {
-    'dbo_Basra': {'db': 'البصرة- الناصرية - الموصل.accdb', 'name': 'البصرة'},
-    'dbo_Diqar': {'db': 'البصرة- الناصرية - الموصل.accdb', 'name': 'ذي قار'},
-    'dbo_Ninawa': {'db': 'البصرة- الناصرية - الموصل.accdb', 'name': 'نينوى'},
-    'dbo_Anbar': {'db': 'بابل- ديالى- الديوانية-صلاح الدين-الانبار.accdb', 'name': 'الأنبار'},
-    'dbo_Babil': {'db': 'بابل- ديالى- الديوانية-صلاح الدين-الانبار.accdb', 'name': 'بابل'},
-    'dbo_diyala': {'db': 'بابل- ديالى- الديوانية-صلاح الدين-الانبار.accdb', 'name': 'ديالى'},
-    'dbo_Qadisyah': {'db': 'بابل- ديالى- الديوانية-صلاح الدين-الانبار.accdb', 'name': 'القادسية'},
-    'dbo_SlahAldin': {'db': 'بابل- ديالى- الديوانية-صلاح الدين-الانبار.accdb', 'name': 'صلاح الدين'},
-    'dbo_Karikh': {'db': 'بغداد كرخ - رصافة.accdb', 'name': 'بغداد الكرخ'},
-    'dbo_Rusafa': {'db': 'بغداد كرخ - رصافة.accdb', 'name': 'بغداد الرصافة'},
-    'dbo_Dahuk': {'db': 'دهوك- اربيل-السليمانية-كركوك.accdb', 'name': 'دهوك'},
-    'dbo_Erbil': {'db': 'دهوك- اربيل-السليمانية-كركوك.accdb', 'name': 'أربيل'},
-    'dbo_Kirkuk': {'db': 'دهوك- اربيل-السليمانية-كركوك.accdb', 'name': 'كركوك'},
-    'dbo_sulimaniah': {'db': 'دهوك- اربيل-السليمانية-كركوك.accdb', 'name': 'السليمانية'},
-    'dbo_Kirbla': {'db': 'كربلاء-ميسان- المثنى- النجف- واسط.accdb', 'name': 'كربلاء'},
-    'dbo_Misan': {'db': 'كربلاء-ميسان- المثنى- النجف- واسط.accdb', 'name': 'ميسان'},
-    'dbo_Muthana': {'db': 'كربلاء-ميسان- المثنى- النجف- واسط.accdb', 'name': 'المثنى'},
-    'dbo_Najaf': {'db': 'كربلاء-ميسان- المثنى- النجف- واسط.accdb', 'name': 'النجف'},
-    'dbo_Wasit': {'db': 'كربلاء-ميسان- المثنى- النجف- واسط.accdb', 'name': 'واسط'}
+# Create database directory if it doesn't exist
+if not os.path.exists(DATABASE_DIR):
+    os.makedirs(DATABASE_DIR)
+
+# Dynamically discover all database files
+def discover_databases():
+    """Discover all .accdb files in the databases directory."""
+    db_files = []
+    if os.path.exists(DATABASE_DIR):
+        for file in os.listdir(DATABASE_DIR):
+            if file.endswith('.accdb'):
+                db_files.append(file)
+    return sorted(db_files)  # Sort for consistent ordering
+
+# Get list of database files (discovered dynamically)
+db_files = discover_databases()
+
+# Table name to display name mapping 
+table_display_names = {
+    'dbo_Basra': 'البصرة',
+    'dbo_Diqar': 'ذي قار',
+    'dbo_Ninawa': 'نينوى',
+    'dbo_Anbar': 'الأنبار',
+    'dbo_Babil': 'بابل',
+    'dbo_diyala': 'ديالى',
+    'dbo_Qadisyah': 'القادسية',
+    'dbo_SlahAldin': 'صلاح الدين',
+    'dbo_Karikh': 'بغداد الكرخ',
+    'dbo_Rusafa': 'بغداد الرصافة',
+    'dbo_Dahuk': 'دهوك',
+    'dbo_Erbil': 'أربيل',
+    'dbo_Kirkuk': 'كركوك',
+    'dbo_sulimaniah': 'السليمانية',
+    'dbo_Kirbla': 'كربلاء',
+    'dbo_Misan': 'ميسان',
+    'dbo_Muthana': 'المثنى',
+    'dbo_Najaf': 'النجف',
+    'dbo_Wasit': 'واسط'
 }
+
+# Expected tables that should exist across all databases
+expected_tables = set(table_display_names.keys())
+
+# Initialize table_to_db as empty dict - will be populated dynamically
+table_to_db = {}
+
+def build_dynamic_table_mapping():
+    """Build table-to-database mapping by discovering which tables exist in which databases."""
+    table_to_db = {}
+    found_tables = set()
+    
+    print("🔍 Discovering table locations across databases...")
+    
+    for db_file in db_files:
+        db_path = os.path.join(DATABASE_DIR, db_file)
+        
+        try:
+            # Try to connect and get table list
+            conn = get_connection(db_path)
+            cursor = conn.cursor()
+            
+            # Get all tables in this database
+            cursor.tables()
+            tables_in_db = []
+            for row in cursor.fetchall():
+                if row.table_type == 'TABLE':
+                    table_name = row.table_name
+                    if table_name in expected_tables:
+                        tables_in_db.append(table_name)
+            
+            print(f"  📁 {db_file}: Found tables {tables_in_db}")
+            
+            # Map each found table to this database
+            for table_name in tables_in_db:
+                if table_name in table_display_names:
+                    table_to_db[table_name] = {
+                        'db': db_file,
+                        'name': table_display_names[table_name]
+                    }
+                    found_tables.add(table_name)
+                    
+        except Exception as e:
+            print(f"  ❌ Error accessing {db_file}: {e}")
+            continue
+    
+    # Report missing tables
+    missing_tables = expected_tables - found_tables
+    if missing_tables:
+        print(f"⚠️  Missing tables: {sorted(missing_tables)}")
+    
+    print(f"✅ Mapped {len(table_to_db)} tables to {len(set(info['db'] for info in table_to_db.values()))} databases")
+    return table_to_db
+
+# Validate that required databases exist
+def validate_databases():
+    """Check if all required databases are present and log warnings for missing ones."""
+    if not table_to_db:
+        print("❌ No tables were mapped to databases. Check database files and connections.")
+        return False
+    
+    missing_databases = []
+    found_databases = []
+    
+    # Check which databases are actually present
+    for db_file in db_files:
+        db_path = os.path.join(DATABASE_DIR, db_file)
+        if os.path.exists(db_path):
+            found_databases.append(db_file)
+        else:
+            missing_databases.append(db_file)
+    
+    if missing_databases:
+        print("⚠️  WARNING: The following database files are missing:")
+        for db in missing_databases:
+            print(f"   - {db}")
+        print(f"   Place them in the '{DATABASE_DIR}/' directory")
+        print()
+    
+    if found_databases:
+        print(f"✅ Found {len(found_databases)} database file(s):")
+        for db in found_databases:
+            print(f"   - {db}")
+        print()
+    
+    # Check table coverage
+    mapped_databases = set(info['db'] for info in table_to_db.values())
+    print(f"📊 Table mapping status:")
+    print(f"   - Expected tables: {len(expected_tables)}")
+    print(f"   - Mapped tables: {len(table_to_db)}")
+    print(f"   - Databases with tables: {len(mapped_databases)}")
+    
+    if len(table_to_db) < len(expected_tables):
+        missing_tables = expected_tables - set(table_to_db.keys())
+        print(f"   - Missing tables: {sorted(missing_tables)}")
+    
+    return len(table_to_db) > 0
+
+# Validate databases and table mapping on startup
+has_databases = validate_databases()
+
+# Validate databases on startup
+has_databases = validate_databases()
 
 def get_connection(db_path):
     """Create or reuse a connection to an Access database."""
@@ -82,6 +196,12 @@ def get_connection(db_path):
     connection_cache[db_path] = conn
     print(f"  Created new connection for {db_path}")
     return conn
+
+# Build the dynamic table-to-database mapping now that get_connection is available
+table_to_db = build_dynamic_table_mapping()
+
+# Validate databases and table mapping on startup
+has_databases = validate_databases()
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -202,7 +322,7 @@ def search_databases_optimized(criteria, selected_table=None, search_mode='parti
         if len(results) >= max_results:
             break
 
-        db_path = os.path.join(os.getcwd(), db_file)
+        db_path = os.path.join(DATABASE_DIR, db_file)
         if not os.path.exists(db_path):
             continue
 
